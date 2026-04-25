@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nzela Shop Bot</title>
+
+```
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #ece5dd;
+    }
+
+    .chat-container {
+        max-width: 500px;
+        margin: auto;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+
+    .chat-header {
+        background: #075e54;
+        color: white;
+        padding: 15px;
+        font-size: 18px;
+    }
+
+    .chat-box {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        background: #ece5dd;
+    }
+
+    .message {
+        margin: 8px 0;
+        max-width: 75%;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    .user {
+        background: #dcf8c6;
+        align-self: flex-end;
+        text-align: right;
+    }
+
+    .bot {
+        background: #fff;
+        border: 1px solid #ccc;
+        align-self: flex-start;
+    }
+
+    .chat-input {
+        display: flex;
+        border-top: 1px solid #ccc;
+    }
+
+    input {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        outline: none;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 12px 15px;
+        border: none;
+        background: #25d366;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1ebc59;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+<div class="chat-container">
+
+```
+<div class="chat-header">
+    Nzela Shop 💬
+</div>
+
+<div class="chat-box" id="chatBox"></div>
+
+<div class="chat-input">
+    <input type="text" id="userInput" placeholder="Écris ton message...">
+    <button onclick="sendMessage()">Envoyer</button>
+</div>
+```
+
+</div>
+
+<script>
+function addMessage(text, className) {
+    const chatBox = document.getElementById("chatBox");
+
+    const messageDiv = document.createElement("div");
+    messageDiv.className = "message " + className;
+    messageDiv.innerText = text;
+
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value.trim();
+
+    if (message === "") return;
+
+    addMessage(message, "user");
+    input.value = "";
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        addMessage(data.reply, "bot");
+    })
+    .catch(() => {
+        addMessage("Erreur de connexion au serveur.", "bot");
+    });
+}
+
+// Permet d'envoyer avec Entrée
+document.getElementById("userInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        sendMessage();
+    }
+});
+</script>
+
+</body>
+</html>
