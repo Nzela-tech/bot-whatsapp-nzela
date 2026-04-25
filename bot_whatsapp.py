@@ -54,7 +54,7 @@ def chat():
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-3-haiku-20240307",
             max_tokens=300,
             system=BOUTIQUE_INFO,
             messages=[{"role": "user", "content": user_msg}]
@@ -88,7 +88,7 @@ def webhook():
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-3-haiku-20240307"",
             max_tokens=300,
             system=BOUTIQUE_INFO,
             messages=conversations[sender]
