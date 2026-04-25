@@ -47,7 +47,7 @@ Règles de réponse :
 conversations = {}
 
 # ── Route principale WhatsApp ──────────────────────────────
-@app.route("/webhook", methods=["POST"])
+@app.route("/webhook", methods=["GET"])
 def webhook():
     # Récupérer le message entrant
     incoming_msg = request.form.get("Body", "").strip()
