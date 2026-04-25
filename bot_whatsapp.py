@@ -1,9 +1,4 @@
-# bot_whatsapp.py
-# Bot WhatsApp pour Commerce / Boutique
-# Stack : Python + Flask + Twilio + Claude API
-# Hébergement : Render + GitHub (nzela-tech)
-
-from flask import Flask, request
+from flask import Flask, request, render_template, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 import anthropic
 import os
@@ -14,7 +9,7 @@ app = Flask(__name__)
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
-# ── Informations de la boutique (à personnaliser) ──────────
+# ── Informations de la boutique ────────────────────────────
 BOUTIQUE_INFO = """
 Tu es l'assistant WhatsApp de la boutique NZELA SHOP.
 
@@ -46,28 +41,51 @@ Règles de réponse :
 # ── Mémoire des conversations ──────────────────────────────
 conversations = {}
 
+# ── 🆕 PAGE WEB (UTILISE templates/index.html) ─────────────
+@app.route("/", methods=["GET"])
+def home():
+    return render_template("index.html")
+
+# ── 🆕 CHAT WEB ───────────────────────────────────────────
+@app.route("/chat", methods=["POST"])
+def chat():
+    data = request.get_json()
+    user_msg = data.get("message", "")
+
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=300,
+            system=BOUTIQUE_INFO,
+            messages=[{"role": "user", "content": user_msg}]
+        )
+        bot_reply = response.content[0].text
+
+    except Exception as e:
+        print("ERREUR WEB:", e)
+        bot_reply = "Désolé, une erreur s'est produite."
+
+    return jsonify({"reply": bot_reply})
+
 # ── Route principale WhatsApp ──────────────────────────────
-@app.route("/webhook", methods=["GET"])
+@app.route("/webhook", methods=["POST"])
 def webhook():
-    # Récupérer le message entrant
     incoming_msg = request.form.get("Body", "").strip()
     sender = request.form.get("From", "")
 
-    # Initialiser la conversation si nouvelle
+    print("MESSAGE REÇU:", incoming_msg)
+
     if sender not in conversations:
         conversations[sender] = []
 
-    # Ajouter le message de l'utilisateur
     conversations[sender].append({
         "role": "user",
         "content": incoming_msg
     })
 
-    # Garder seulement les 10 derniers messages (mémoire courte)
     if len(conversations[sender]) > 10:
         conversations[sender] = conversations[sender][-10:]
 
-    # Appel à Claude
     try:
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
@@ -78,23 +96,17 @@ def webhook():
         bot_reply = response.content[0].text
 
     except Exception as e:
-        bot_reply = "Désolé, une erreur s'est produite. Veuillez réessayer ou appeler directement la boutique."
+        print("ERREUR CLAUDE:", e)
+        bot_reply = "Désolé, une erreur s'est produite. Veuillez réessayer."
 
-    # Ajouter la réponse à la mémoire
     conversations[sender].append({
         "role": "assistant",
         "content": bot_reply
     })
 
-    # Envoyer la réponse via Twilio
     resp = MessagingResponse()
     resp.message(bot_reply)
     return str(resp)
-
-# ── Route de test (vérifier que le serveur tourne) ─────────
-@app.route("/", methods=["GET"])
-def home():
-    return "✅ Bot Nzela Shop actif et opérationnel.", 200
 
 # ── Lancement ──────────────────────────────────────────────
 if __name__ == "__main__":
