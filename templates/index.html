@@ -1,153 +1,678 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Nzela Shop Bot</title>
 
-```
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #ece5dd;
-    }
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    .chat-container {
-        max-width: 500px;
-        margin: auto;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        background: #fff;
-    }
+    <title>JARVIS AI</title>
 
-    .chat-header {
-        background: #075e54;
-        color: white;
-        padding: 15px;
-        font-size: 18px;
-    }
+    <style>
+        :root {
+            --background: #0b0f17;
+            --panel: #111827;
+            --panel-light: #172033;
+            --border: #263247;
+            --text: #f3f4f6;
+            --muted: #9ca3af;
+            --accent: #d6b36a;
+            --accent-dark: #a88743;
+            --user: #1e3a5f;
+            --assistant: #172033;
+            --danger: #ef4444;
+        }
 
-    .chat-box {
-        flex: 1;
-        padding: 10px;
-        overflow-y: auto;
-        background: #ece5dd;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    .message {
-        margin: 8px 0;
-        max-width: 75%;
-        padding: 10px;
-        border-radius: 10px;
-        font-size: 14px;
-    }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    #18243a 0%,
+                    transparent 40%
+                ),
+                var(--background);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
-    .user {
-        background: #dcf8c6;
-        align-self: flex-end;
-        text-align: right;
-    }
+        .app {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .bot {
-        background: #fff;
-        border: 1px solid #ccc;
-        align-self: flex-start;
-    }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(11, 15, 23, 0.92);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-    .chat-input {
-        display: flex;
-        border-top: 1px solid #ccc;
-    }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    input {
-        flex: 1;
-        padding: 12px;
-        border: none;
-        outline: none;
-        font-size: 14px;
-    }
+        .logo {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: linear-gradient(
+                135deg,
+                var(--accent),
+                var(--accent-dark)
+            );
+            color: #101010;
+            font-size: 23px;
+            font-weight: 900;
+            box-shadow: 0 0 28px rgba(214, 179, 106, 0.18);
+        }
 
-    button {
-        padding: 12px 15px;
-        border: none;
-        background: #25d366;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
+        .brand-title {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
 
-    button:hover {
-        background: #1ebc59;
-    }
-</style>
-```
+        .brand-subtitle {
+            margin-top: 3px;
+            font-size: 12px;
+            color: var(--muted);
+        }
 
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+        }
+
+        .main {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .welcome {
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: linear-gradient(
+                135deg,
+                rgba(23, 32, 51, 0.92),
+                rgba(17, 24, 39, 0.92)
+            );
+            margin-bottom: 20px;
+        }
+
+        .welcome h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+        }
+
+        .welcome p {
+            margin: 0;
+            line-height: 1.6;
+            color: var(--muted);
+        }
+
+        .chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding-bottom: 160px;
+        }
+
+        .message {
+            display: flex;
+            width: 100%;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .bubble {
+            max-width: 82%;
+            padding: 14px 16px;
+            border-radius: 18px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            border: 1px solid var(--border);
+        }
+
+        .message.user .bubble {
+            background: var(--user);
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.assistant .bubble {
+            background: var(--assistant);
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .composer-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 24px 22px;
+            background: linear-gradient(
+                to top,
+                var(--background) 65%,
+                transparent
+            );
+            z-index: 20;
+        }
+
+        .composer {
+            width: 100%;
+            max-width: 1052px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            padding: 10px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: rgba(17, 24, 39, 0.97);
+            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 48px;
+            max-height: 180px;
+            resize: vertical;
+            border: 0;
+            outline: none;
+            padding: 13px;
+            background: transparent;
+            color: var(--text);
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        textarea::placeholder {
+            color: #6b7280;
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
+            border-radius: 13px;
+            padding: 13px 17px;
+            font-weight: 800;
+            transition:
+                transform 0.15s ease,
+                background 0.15s ease,
+                opacity 0.15s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            transform: none;
+        }
+
+        .send-button {
+            background: var(--accent);
+            color: #111827;
+        }
+
+        .new-button {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 12px;
+        }
+
+        .typing {
+            color: var(--muted);
+            font-size: 13px;
+            padding: 0 4px;
+        }
+
+        .error {
+            color: #fecaca;
+            background: rgba(127, 29, 29, 0.35);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 12px;
+            border-radius: 12px;
+            white-space: pre-wrap;
+        }
+
+        .meta {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        @media (max-width: 700px) {
+            .header {
+                padding: 14px;
+            }
+
+            .main {
+                padding: 14px;
+            }
+
+            .welcome h1 {
+                font-size: 23px;
+            }
+
+            .bubble {
+                max-width: 94%;
+            }
+
+            .composer-wrapper {
+                padding: 10px;
+            }
+
+            .composer {
+                padding: 7px;
+            }
+
+            .send-button {
+                padding: 13px;
+            }
+
+            .new-button {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
+<div class="app">
 
-<div class="chat-container">
+    <header class="header">
+        <div class="brand">
+            <div class="logo">J</div>
 
-```
-<div class="chat-header">
-    Nzela Shop 💬
-</div>
+            <div>
+                <div class="brand-title">JARVIS AI</div>
+                <div class="brand-subtitle">
+                    GPT-2 + moteur de raisonnement local
+                </div>
+            </div>
+        </div>
 
-<div class="chat-box" id="chatBox"></div>
+        <div class="status">
+            <span class="status-dot"></span>
+            <span id="statusText">Connexion...</span>
+        </div>
+    </header>
 
-<div class="chat-input">
-    <input type="text" id="userInput" placeholder="Écris ton message...">
-    <button onclick="sendMessage()">Envoyer</button>
-</div>
-```
+    <main class="main">
+
+        <section class="welcome">
+            <h1>Bonjour, je suis JARVIS.</h1>
+
+            <p>
+                Pose-moi une question, demande une explication,
+                teste un calcul ou commence une conversation.
+            </p>
+        </section>
+
+        <section
+            id="chat"
+            class="chat"
+            aria-live="polite"
+        ></section>
+
+    </main>
+
+    <div class="composer-wrapper">
+        <form id="chatForm" class="composer">
+
+            <textarea
+                id="messageInput"
+                placeholder="Écris ton message à JARVIS..."
+                autocomplete="off"
+                required
+            ></textarea>
+
+            <button
+                type="button"
+                id="newButton"
+                class="new-button"
+            >
+                Nouvelle
+            </button>
+
+            <button
+                type="submit"
+                id="sendButton"
+                class="send-button"
+            >
+                Envoyer
+            </button>
+
+        </form>
+    </div>
 
 </div>
 
 <script>
-function addMessage(text, className) {
-    const chatBox = document.getElementById("chatBox");
+    "use strict";
 
-    const messageDiv = document.createElement("div");
-    messageDiv.className = "message " + className;
-    messageDiv.innerText = text;
+    let conversationId = null;
+    let isSending = false;
 
-    chatBox.appendChild(messageDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
+    const chatElement = document.getElementById("chat");
+    const formElement = document.getElementById("chatForm");
+    const inputElement = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+    const newButton = document.getElementById("newButton");
+    const statusText = document.getElementById("statusText");
 
-function sendMessage() {
-    const input = document.getElementById("userInput");
-    const message = input.value.trim();
+    function addMessage(
+        role,
+        content,
+        metadata = ""
+    ) {
+        const messageElement = document.createElement("div");
+        messageElement.className = `message ${role}`;
 
-    if (message === "") return;
+        const bubbleElement = document.createElement("div");
+        bubbleElement.className = "bubble";
 
-    addMessage(message, "user");
-    input.value = "";
+        const labelElement = document.createElement("div");
+        labelElement.className = "message-label";
+        labelElement.textContent = role === "user"
+            ? "Utilisateur"
+            : "JARVIS";
 
-    fetch("/chat", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message: message })
-    })
-    .then(res => res.json())
-    .then(data => {
-        addMessage(data.reply, "bot");
-    })
-    .catch(() => {
-        addMessage("Erreur de connexion au serveur.", "bot");
-    });
-}
+        const contentElement = document.createElement("div");
+        contentElement.textContent = content;
 
-// Permet d'envoyer avec Entrée
-document.getElementById("userInput").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        sendMessage();
+        bubbleElement.appendChild(labelElement);
+        bubbleElement.appendChild(contentElement);
+
+        if (metadata) {
+            const metaElement = document.createElement("div");
+            metaElement.className = "meta";
+            metaElement.textContent = metadata;
+            bubbleElement.appendChild(metaElement);
+        }
+
+        messageElement.appendChild(bubbleElement);
+        chatElement.appendChild(messageElement);
+
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
     }
-});
+
+    function addTyping() {
+        const typingElement = document.createElement("div");
+        typingElement.id = "typingElement";
+        typingElement.className = "typing";
+        typingElement.textContent = "JARVIS réfléchit...";
+        chatElement.appendChild(typingElement);
+    }
+
+    function removeTyping() {
+        const typingElement = document.getElementById(
+            "typingElement"
+        );
+
+        if (typingElement) {
+            typingElement.remove();
+        }
+    }
+
+    function setSending(value) {
+        isSending = value;
+        sendButton.disabled = value;
+        inputElement.disabled = value;
+        newButton.disabled = value;
+
+        if (value) {
+            sendButton.textContent = "En cours...";
+        } else {
+            sendButton.textContent = "Envoyer";
+        }
+    }
+
+    async function createConversation() {
+        const response = await fetch(
+            "/api/conversation",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                "Impossible de créer une conversation."
+            );
+        }
+
+        const data = await response.json();
+
+        conversationId = data.conversation_id;
+    }
+
+    async function checkHealth() {
+        try {
+            const response = await fetch("/api/health");
+
+            if (!response.ok) {
+                throw new Error("Serveur indisponible.");
+            }
+
+            const data = await response.json();
+
+            if (data.model_loaded) {
+                statusText.textContent =
+                    `Connecté · ${data.device}`;
+            } else {
+                statusText.textContent =
+                    "Modèle non chargé";
+            }
+
+        } catch (error) {
+            statusText.textContent = "Serveur indisponible";
+        }
+    }
+
+    async function sendMessage(message) {
+        const response = await fetch(
+            "/api/chat",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        conversation_id: conversationId,
+                        message: message
+                    }
+                )
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.error || "Erreur pendant la conversation."
+            );
+        }
+
+        return data;
+    }
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        if (isSending) {
+            return;
+        }
+
+        const message = inputElement.value.trim();
+
+        if (!message) {
+            return;
+        }
+
+        inputElement.value = "";
+
+        addMessage("user", message);
+        addTyping();
+        setSending(true);
+
+        try {
+            const data = await sendMessage(message);
+
+            removeTyping();
+
+            let metadata = "";
+
+            if (data.source === "jarvis_local_math") {
+                metadata = "Calcul vérifié localement";
+            } else if (data.source === "gpt2") {
+                metadata = "Réponse générée par GPT-2";
+            }
+
+            addMessage(
+                "assistant",
+                data.answer,
+                metadata
+            );
+
+        } catch (error) {
+            removeTyping();
+
+            const errorElement = document.createElement("div");
+            errorElement.className = "error";
+            errorElement.textContent = error.message;
+            chatElement.appendChild(errorElement);
+
+        } finally {
+            setSending(false);
+            inputElement.focus();
+        }
+    }
+
+    async function startNewConversation() {
+        if (isSending) {
+            return;
+        }
+
+        try {
+            await createConversation();
+
+            chatElement.innerHTML = "";
+
+            addMessage(
+                "assistant",
+                "Nouvelle conversation créée. Je t'écoute."
+            );
+
+        } catch (error) {
+            const errorElement = document.createElement("div");
+            errorElement.className = "error";
+            errorElement.textContent = error.message;
+            chatElement.appendChild(errorElement);
+        }
+    }
+
+    formElement.addEventListener(
+        "submit",
+        handleSubmit
+    );
+
+    newButton.addEventListener(
+        "click",
+        startNewConversation
+    );
+
+    inputElement.addEventListener(
+        "keydown",
+        function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                formElement.requestSubmit();
+            }
+        }
+    );
+
+    async function initialize() {
+        await checkHealth();
+
+        try {
+            await createConversation();
+
+            addMessage(
+                "assistant",
+                "Je suis prêt. Pose-moi ta première question."
+            );
+
+        } catch (error) {
+            const errorElement = document.createElement("div");
+            errorElement.className = "error";
+            errorElement.textContent = error.message;
+            chatElement.appendChild(errorElement);
+        }
+    }
+
+    initialize();
 </script>
 
 </body>
